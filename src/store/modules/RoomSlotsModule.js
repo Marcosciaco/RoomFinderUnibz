@@ -4,7 +4,7 @@ import Room from "@/model/Room";
 import * as rooms from "@/assets/example.json";
 
 const state = {
-    roomSlots: [],
+    roomSlots: ([] = []),
     loadedRoomSlots: false,
 };
 
@@ -12,7 +12,7 @@ const actions = {
     loadRoomSlots({ commit }) {
         if (!state.loadedRoomSlots) {
             rooms.data.forEach((roomSlot) => {
-                commit("addRoomSlot", parseRoomSlot(roomSlot));
+                parseRoomSlot(commit, roomSlot);
             });
             commit("setRoomSlotsLoaded", true);
         }
@@ -51,26 +51,28 @@ export default {
     mutations,
 };
 
-function parseRoomSlot(roomSlot) {
-    const slots = [];
-
-    roomSlot.reservedSlots.forEach((slot) => {
-        slots.push(new Slot(slot.start, slot.end));
-    });
-
-    roomSlot.freeSlots.forEach((slot) => {
-        slots.push(new Slot(slot.start, slot.end));
-    });
-
+function parseRoomSlot(commit, roomSlot) {
     const room = new Room(
         roomSlot.room.campus,
         roomSlot.room.building,
         roomSlot.room.name
     );
 
-    const r = new RoomSlot(room, slots);
+    roomSlot.reservedSlots.forEach((slot) => {
+        commit(
+            "addRoomSlot",
+            new RoomSlot(room, new Slot(slot.start, slot.end, false))
+        );
+    });
 
-    console.log(r);
+    roomSlot.freeSlots.forEach((slot) => {
+        commit(
+            "addRoomSlot",
+            new RoomSlot(room, new Slot(slot.start, slot.end, true))
+        );
+    });
 
-    return r;
+    state.roomSlots.sort((a, b) => {
+        return new Date(a.slots.startTime) - new Date(b.slots.startTime);
+    });
 }
