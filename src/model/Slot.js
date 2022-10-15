@@ -1,4 +1,4 @@
-export class Slot {
+export default class Slot {
     /**
      * Defines a slot.
      * @param {string} startTime ...start time of the slot

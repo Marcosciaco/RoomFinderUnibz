@@ -1,4 +1,4 @@
-export class Room {
+export default class Room {
     /**
      * Defines a room.
      * @param {string} campus ...BZ or BK
