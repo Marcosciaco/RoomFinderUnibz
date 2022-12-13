@@ -1,5 +1,3 @@
-import { v4 as uuidv4 } from "uuid";
-
 export default class RoomSlot {
     /**
      * Defines a room slot.
@@ -7,9 +5,10 @@ export default class RoomSlot {
      * @param {Room} room ...The room of the room slot
      * @param {Slot} slots ...The slot of the room slot
      */
-    constructor(room, slot) {
-        this.id = uuidv4();
+    constructor(room, reservedSlots, freeSlots, actual) {
         this.room = room;
-        this.slots = slot;
+        this.actual = actual;
+        this.reservedSlots = reservedSlots;
+        this.freeSlots = freeSlots;
     }
 }

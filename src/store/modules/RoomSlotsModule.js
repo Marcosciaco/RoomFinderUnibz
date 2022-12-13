@@ -1,7 +1,7 @@
 import RoomSlot from "@/model/RoomSlot";
-import Slot from "@/model/Slot";
 import Room from "@/model/Room";
-import * as rooms from "@/assets/example.json";
+import Slot from "@/model/Slot";
+import axios from "axios";
 
 const state = {
     roomSlots: ([] = []),
@@ -11,9 +11,17 @@ const state = {
 const actions = {
     loadRoomSlots({ commit }) {
         if (!state.loadedRoomSlots) {
-            rooms.data.forEach((roomSlot) => {
-                parseRoomSlot(commit, roomSlot);
-            });
+            state.roomSlots = [];
+            axios
+                .get(
+                    "https://europe-west1-unibz-room-finder.cloudfunctions.net/roomsTimeSlots"
+                )
+                .then((response) => {
+                    response.data.data.forEach((roomSlot) => {
+                        parseRoomSlot(commit, roomSlot);
+                    });
+                });
+
             commit("setRoomSlotsLoaded", true);
         }
     },
@@ -58,21 +66,28 @@ function parseRoomSlot(commit, roomSlot) {
         roomSlot.room.name
     );
 
-    roomSlot.reservedSlots.forEach((slot) => {
-        commit(
-            "addRoomSlot",
-            new RoomSlot(room, new Slot(slot.start, slot.end, false))
-        );
+    const free = roomSlot.freeSlots.filter((slot) => {
+        return new Date(slot.end) >= Date.now() || slot.end == null;
+    });
+    const occ = roomSlot.reservedSlots.filter((slot) => {
+        return new Date(slot.end) >= Date.now() || slot.end == null;
     });
 
-    roomSlot.freeSlots.forEach((slot) => {
-        commit(
-            "addRoomSlot",
-            new RoomSlot(room, new Slot(slot.start, slot.end, true))
-        );
-    });
+    const freeSlot = free[0];
+    const reservedSlot = occ[0];
 
-    state.roomSlots.sort((a, b) => {
-        return new Date(a.slots.startTime) - new Date(b.slots.startTime);
-    });
+    const actual =
+        free.length > occ.length
+            ? new Slot(freeSlot.start, freeSlot.end, true, freeSlot.description)
+            : new Slot(
+                  reservedSlot.start,
+                  reservedSlot.end,
+                  false,
+                  reservedSlot.description
+              );
+
+    commit(
+        "addRoomSlot",
+        new RoomSlot(room, roomSlot.reservedSlots, roomSlot.freeSlots, actual)
+    );
 }

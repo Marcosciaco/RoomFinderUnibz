@@ -5,9 +5,10 @@ export default class Slot {
      * @param {string} endTime ...end time of the slot
      * @param {boolean} available ...if the room is available
      */
-    constructor(startTime, endTime, available) {
-        this.startTime = startTime;
-        this.endTime = endTime;
+    constructor(startTime, endTime, available, description) {
+        this.start = startTime;
+        this.end = endTime;
+        this.description = description;
         this.available = available;
     }
 }

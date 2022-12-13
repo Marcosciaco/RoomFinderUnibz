@@ -21,6 +21,12 @@ export default new Vuetify({
                 light: "#F3F8FF",
                 dark: "#384956",
                 grey: "#D9D9D9",
+
+                pastelBlue: "#194569",
+                pastelYellow: "#FFE662",
+                pastelGrey: "#111111",
+                pastelViolet: "#B399D4",
+                pastelOrange: "#FFB347",
             },
             dark: {
                 base: "#2B363F",
@@ -34,6 +40,12 @@ export default new Vuetify({
                 light: "#222222",
                 dark: "#F3F8FF",
                 grey: "#D9D9D9",
+
+                pastelBlue: "#194569",
+                pastelYellow: "#FFE662",
+                pastelGrey: "#111111",
+                pastelViolet: "#B399D4",
+                pastelOrange: "#FFB347",
             },
         },
     },

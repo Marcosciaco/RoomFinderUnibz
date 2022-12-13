@@ -1,31 +1,67 @@
 <template>
     <div>
-        <div class="row-container">
+        <div class="row-container" @click="routeToDetailedView(roomSlot)">
             <div class="slot-room">
                 {{ roomSlot.room.campus }} {{ roomSlot.room.building
                 }}{{ roomSlot.room.roomName }}
             </div>
-            <div v-if="roomSlot.slots.available" class="slot-time-available">
-                {{ getHour(roomSlot.slots.startTime) }} -
-                {{ getHour(roomSlot.slots.endTime) }}
+            <div v-if="isAvailable()" class="slot-time">
+                {{
+                    getHour(actual.start) === "1:00"
+                        ? "Opening"
+                        : getHour(actual.start)
+                }}
+                -
+                {{
+                    getHour(actual.end) === "1:00"
+                        ? "Closing"
+                        : getHour(actual.end)
+                }}
             </div>
-            <div v-if="!roomSlot.slots.available" class="slot-time-available">
-                {{ getHour(roomSlot.slots.startTime) }} -
-                {{ getHour(roomSlot.slots.endTime) }}
+            <div v-if="!isAvailable()" class="slot-time">
+                {{
+                    getHour(actual.start) === "1:00"
+                        ? "Opening"
+                        : getHour(actual.start)
+                }}
+                -
+                {{
+                    getHour(actual.end) === "1:00"
+                        ? "Closing"
+                        : getHour(actual.end)
+                }}
+                -
+                {{ actual.description }}
             </div>
-            <div v-if="roomSlot.slots.available" class="slot-available"></div>
-            <div
-                v-if="!roomSlot.slots.available"
-                class="slot-not-available"
-            ></div>
+            <div v-if="isAvailable()" class="slot-available"></div>
+            <div v-if="!isAvailable()" class="slot-not-available"></div>
         </div>
     </div>
 </template>
 
 <script>
 export default {
+    name: "RoomSlotEntry",
     props: ["roomSlot"],
+    data() {
+        return {
+            actual: null,
+        };
+    },
     methods: {
+        isAvailable() {
+            const free = this.roomSlot.freeSlots.filter((slot) => {
+                return new Date(slot.end) >= Date.now() || slot.end == null;
+            });
+            const occ = this.roomSlot.reservedSlots.filter((slot) => {
+                return new Date(slot.end) >= Date.now() || slot.end == null;
+            });
+
+            this.actual = free.length > occ.length ? free[0] : occ[0];
+
+            return this.actual.description === null;
+        },
+
         getHour(endTime) {
             const date = new Date(endTime);
             const minutes = String(date.getMinutes())
@@ -33,6 +69,16 @@ export default {
                 .padEnd(2, "0");
 
             return date.getHours() + ":" + minutes;
+        },
+        routeToDetailedView(roomSlot) {
+            this.$router.push({
+                path: `/roomslot/${
+                    roomSlot.room.campus +
+                    "_" +
+                    roomSlot.room.building +
+                    roomSlot.room.roomName
+                }`,
+            });
         },
     },
 };
@@ -61,12 +107,17 @@ export default {
     margin-left: 5px;
     color: var(--v-dark-base);
     border-right: 1px solid var(--v-grey-base);
+    min-width: 15%;
+    text-align: center;
 }
 
 .slot-time {
-    width: 50%;
+    max-width: calc(100% - 15% - 100px);
     color: var(--v-dark-base);
     text-align: center;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 .slot-available {

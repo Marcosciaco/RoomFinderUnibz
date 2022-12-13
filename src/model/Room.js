@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from "uuid";
+
 export default class Room {
     /**
      * Defines a room.
@@ -6,6 +8,7 @@ export default class Room {
      * @param {string} roomNumber ...containing floor and room number
      */
     constructor(campus, building, roomNumber) {
+        this.id = campus + "_" + building + roomNumber;
         this.campus = campus;
         this.building = building;
         this.roomName = roomNumber;
