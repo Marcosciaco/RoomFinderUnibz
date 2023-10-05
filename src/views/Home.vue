@@ -41,7 +41,7 @@
                 solo
                 v-model="selected"
                 class="room-picker"
-                @change="searchRoom()"
+                @change="fuzzySearch()"
             ></v-text-field>
         </div>
         <div style="padding-top: 55px">
@@ -103,6 +103,16 @@ export default {
                 ? filtered.filter((slot) => slot.actual.available)
                 : filtered;
         },
+
+        fuzzySearch() {
+            const filtered = this.slots.filter((slot) => {
+                return slot.room.id.toLowerCase().includes(this.selected.toLowerCase());
+            });
+
+            this.displayedSlots = this.available
+                ? filtered.filter((slot) => slot.actual.available)
+                : filtered;
+        }
     },
 };
 </script>

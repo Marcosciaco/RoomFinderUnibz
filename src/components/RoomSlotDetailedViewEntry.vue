@@ -50,7 +50,10 @@
                         getHour(roomSlot.end) === "1:00"
                             ? "Closing"
                             : getHour(roomSlot.end)
-                    }}</b>
+                    }}</b><br>
+                    <div class="slot-description">
+                        {{ roomSlot.description }}
+                    </div>
                 </div>
             </div>
         </div>
@@ -131,5 +134,15 @@ export default {
 .time-desc {
     text-align: center;
     width: calc(100% - 100px);
+}
+
+.slot-description {
+    font-size: 12px;
+    font-weight: 400;
+    text-wrap: nowrap; 
+    text-overflow: ellipsis; 
+    padding: 0px 10px;
+    padding-top: 5px; 
+    overflow: hidden;
 }
 </style>
